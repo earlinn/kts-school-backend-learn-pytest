@@ -17,3 +17,24 @@ exclude = '''
   | venv
 )/
 '''
+[tool.poetry]
+name = "5-tests"
+version = "0.1.0"
+description = ""
+authors = ["earlinn"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+aiohttp = "^3.9.5"
+aiohttp-apispec = "^2.2.3"
+alembic = "^1.13.1"
+gino = "^1.0.1"
+python-dateutil = "^2.9.0.post0"
+pyyaml = "^6.0.1"
+psycopg2-binary = "^2.9.9"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
