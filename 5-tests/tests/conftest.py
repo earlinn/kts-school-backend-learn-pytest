@@ -71,7 +71,8 @@ async def db_transaction(cli):
 
 
 # Мокаем дефолтное время с помощью библиотеки freezegun
-@pytest.fixture
+# autouse=True значит эта фикстура применяется при всех тестах по умолчанию
+@pytest.fixture(autouse=True)
 def freeze_t():
     freezer = freeze_time(DEFAULT_TIME)
     freezer.start()

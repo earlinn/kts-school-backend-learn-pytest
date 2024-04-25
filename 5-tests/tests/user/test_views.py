@@ -1,6 +1,8 @@
 import datetime
 import uuid
 
+from freezegun import freeze_time
+
 from blog_app.user.models import Session, User
 from tests.conftest import DEFAULT_TIME, authenticate
 
@@ -54,3 +56,12 @@ class TestMeView:
             response = await cli.get("/user.me")
         assert response.status == 200
         assert await response.json() == user2dict(user)
+
+
+class TestAuthorization:
+    async def test_authorized(self, cli, user: User):
+        async with authenticate(cli, user):
+            with freeze_time(DEFAULT_TIME + datetime.timedelta(days=2)):
+                response = await cli.get("/user.me")
+        assert response.status == 401
+        assert await response.json() == {"code": "unauthorized"}
