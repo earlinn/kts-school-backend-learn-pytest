@@ -2,7 +2,15 @@ import datetime
 import uuid
 
 from blog_app.user.models import Session, User
-from tests.conftest import DEFAULT_TIME
+from tests.conftest import DEFAULT_TIME, authenticate
+
+
+def user2dict(user: User):
+    return {
+        "username": user.username,
+        "created": user.created.isoformat(),
+        "id": user.id,
+    }
 
 
 class TestRegisterView:
@@ -11,11 +19,7 @@ class TestRegisterView:
         response = await cli.post("/user.register", json=data)
         assert response.status == 200
         user = await User.query.gino.first()
-        assert await response.json() == {
-            "username": user.username,
-            "created": user.created.isoformat(),
-            "id": user.id,
-        }
+        assert await response.json() == user2dict(user)
 
     async def test_already_exists(self, cli, user: User):
         data = {"username": user.username, "password": "1234"}
@@ -37,3 +41,16 @@ class TestLoginView:
         assert session.user_id == user.id
         assert session.expires == DEFAULT_TIME + datetime.timedelta(days=1)
         assert await response.json() == {"token": token}
+
+
+class TestMeView:
+    async def test_unauthorized(self, cli):
+        response = await cli.get("/user.me")
+        assert response.status == 401
+        assert await response.json() == {"code": "unauthorized"}
+
+    async def test_authorized(self, cli, user: User):
+        async with authenticate(cli, user):
+            response = await cli.get("/user.me")
+        assert response.status == 200
+        assert await response.json() == user2dict(user)

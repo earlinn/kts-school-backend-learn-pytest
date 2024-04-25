@@ -7,6 +7,7 @@ from gino import GinoEngine
 import pytest
 
 from blog_app import settings
+from blog_app.user.models import Session
 from tests.fixtures import *
 
 settings.config = settings.get_config(
@@ -76,3 +77,19 @@ def freeze_t():
     freezer.start()
     yield DEFAULT_TIME
     freezer.stop()
+
+
+# Фикстура, возвращающая авторизованного клиента
+class authenticate:
+    def __init__(self, cli, user) -> None:
+        self.cli = cli
+        self.user = user
+
+    async def __aenter__(self):
+        session = await Session.generate(self.user.id)
+        self.cli.session._default_headers["Authorization"] = (
+            f"Bearer {session.key}"
+        )
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
+        self.cli.session._default_headers.pop("Authorization")
