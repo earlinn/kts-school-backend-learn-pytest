@@ -1,5 +1,8 @@
+import datetime
 import functools
 
+from dateutil import tz
+from freezegun import freeze_time
 from gino import GinoEngine
 import pytest
 
@@ -11,6 +14,8 @@ settings.config = settings.get_config(
 )
 
 from blog_app.web.app import create_app
+
+DEFAULT_TIME = datetime.datetime(2020, 2, 15, 0, tzinfo=tz.UTC)
 
 
 # Фикстура aiohttp-приложения
@@ -62,3 +67,12 @@ async def db_transaction(cli):
         yield
         await transaction.rollback()
         GinoEngine.acquire = real_acquire
+
+
+# Мокаем дефолтное время с помощью библиотеки freezegun
+@pytest.fixture
+def freeze_t():
+    freezer = freeze_time(DEFAULT_TIME)
+    freezer.start()
+    yield DEFAULT_TIME
+    freezer.stop()

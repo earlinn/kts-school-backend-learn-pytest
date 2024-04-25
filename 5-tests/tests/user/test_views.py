@@ -1,5 +1,8 @@
+import datetime
 import uuid
+
 from blog_app.user.models import Session, User
+from tests.conftest import DEFAULT_TIME
 
 
 class TestRegisterView:
@@ -22,8 +25,9 @@ class TestRegisterView:
 
 
 class TestLoginView:
-    async def test_success(self, cli, user: User, mocker):
+    async def test_success(self, cli, user: User, mocker, freeze_t):
         token = "0" * 32
+        # Замокаем uuid4
         mock_uuid = mocker.patch.object(uuid, "uuid4", autospec=True)
         mock_uuid.return_value = uuid.UUID(hex=token)
         data = {"username": user.username, "password": "1234"}
@@ -31,4 +35,5 @@ class TestLoginView:
         assert response.status == 200
         session = await Session.query.where(Session.key == token).gino.first()
         assert session.user_id == user.id
+        assert session.expires == DEFAULT_TIME + datetime.timedelta(days=1)
         assert await response.json() == {"token": token}
