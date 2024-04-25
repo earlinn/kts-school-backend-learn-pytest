@@ -1,6 +1,7 @@
 import datetime
 import functools
 
+from aioresponses import aioresponses
 from dateutil import tz
 from freezegun import freeze_time
 from gino import GinoEngine
@@ -94,3 +95,10 @@ class authenticate:
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         self.cli.session._default_headers.pop("Authorization")
+
+
+# Мокаем ответ внешнего апи
+@pytest.fixture(autouse=True)
+async def mock_response():
+    with aioresponses(passthrough=["http://127.0.0.1"]) as responses_mock:
+        yield responses_mock

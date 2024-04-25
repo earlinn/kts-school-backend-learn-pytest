@@ -65,3 +65,15 @@ class TestAuthorization:
                 response = await cli.get("/user.me")
         assert response.status == 401
         assert await response.json() == {"code": "unauthorized"}
+
+
+class TestExternal:
+    async def test_success(self, cli, mock_response):
+        mock_response.get(
+            "https://www.metaweather.com/api/location/44418/",
+            status=200,
+            payload={"temp": 23},
+        )
+        response = await cli.get("/user.external")
+        assert response.status == 200
+        assert await response.json() == {"temp": 23}
