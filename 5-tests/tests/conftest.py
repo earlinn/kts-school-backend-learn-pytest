@@ -4,6 +4,7 @@ from gino import GinoEngine
 import pytest
 
 from blog_app import settings
+from tests.fixtures import *
 
 settings.config = settings.get_config(
     settings.BASE_DIR / "config" / "test.yaml"
