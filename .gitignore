@@ -130,3 +130,6 @@ dmypy.json
 *.idea
 
 .DS_STORE
+
+# VSCode staff
+.vscode/

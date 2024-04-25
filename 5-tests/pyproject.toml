@@ -34,8 +34,13 @@ python-dateutil = "^2.9.0.post0"
 pyyaml = "^6.0.1"
 psycopg2-binary = "^2.9.9"
 pytest-aiohttp = "^1.0.5"
+pytest-asyncio = "^0.23.6"
 
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+asyncio_mode = "auto"
